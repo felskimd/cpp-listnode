@@ -11,40 +11,6 @@ struct ListNode { // ListNode модифицировать нельзя
     std::string data; // произвольные пользовательские данные 
 };
 
-//Реализуйте сериализацию и десериализацию двусвязного списка ListNode, где:
-//-prev и next указывают на предыдущий / следующий элемент списка
-//- rand указывает на произвольный элемент этого же списка или nullptr
-//- Каждый элемент содержит строку data
-//Необходимо :
-//1. Считать текстовое описание списка из файла inlet.in
-//2. Построить связанный список ListNode* head по этим данным
-//3. Сериализовать список в бинарный файл outlet.out
-
-//2. Формат входного файла inlet.in
-//Простой текстовый формат.Каждая строка описывает один узел :
-//<data>; <rand_index>
-//Где:
-//-<data> — строка(могут быть пробелы, спецсимволы, кодировка UTF - 8)
-//- <rand_index> — индекс узла, на который указывает rand, либо - 1, если rand == nullptr
-//Пример входного файла(inlet.in) :
-//    apple; 2
-//    banana; -1
-//    carrot; 1
-//    Этот список :
-//-Узел 0 : "apple" → rand на узел 2
-//- Узел 1 : "banana" → rand = nullptr
-//- Узел 2 : "carrot" → rand на узел 1
-
-//3. Выходной файл(outlet.out)
-//Бинарный файл, содержащий сериализованное представление двусвязного списка.
-//4. Ограничения
-//- Максимальное число узлов : 10⁶
-//- data может быть длиной до 1000 символов
-//6. Требования к сдаче работы
-//Работы принимаются только в виде ссылки на публичный репозиторий на GitHub
-//Требования к ссылке :
-//·	Должна быть указана ссылка на сам репозиторий, а не на архив, отдельный файл или ветку.
-//·	Репозиторий должен быть доступен для клонирования командой git clone <ссылка>
 void RecursiveDelete(ListNode* head) {
     if (head->next) {
         RecursiveDelete(head->next);
@@ -82,6 +48,7 @@ struct ParsingData {
 };
 
 std::optional<ParsingData> ParseNodeEndingLine(std::string& target) {
+    // до и после id могут быть пробелы
     static std::regex reg{ "^\\s*-?\\d+\\s*$" };
 
     int sep_pos = target.size() - 1;
@@ -105,9 +72,9 @@ ListNode* Deserialize(const std::string& file_name) {
     }
     ListNode* head = nullptr;
     ListNode* current = nullptr;
+    ListNode* prev = nullptr;
     int current_id = 0;
     std::unordered_map<int, int> id_to_rand_value;
-    ListNode* prev = nullptr;
     std::unordered_map<int, ListNode*> id_to_node;
     id_to_node[-1] = nullptr;
     std::string node_value;
@@ -139,6 +106,7 @@ ListNode* Deserialize(const std::string& file_name) {
         }
     }
     in.close();
+
     for (const auto& [from, to] : id_to_rand_value) {
         id_to_node.at(from)->rand = id_to_node.at(to);
     }
