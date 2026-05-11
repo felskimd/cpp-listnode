@@ -82,6 +82,7 @@ ListNode* Deserialize(const std::string& file_name) {
     std::string line;
     bool first = true;
     std::ifstream in(file_name);
+    // можно было сделать проще, но захотелось, чтобы <data> могла быть многострочной
     while (std::getline(in, line)) {
         auto parse_result = ParseNodeEndingLine(line);
         if (parse_result) {
