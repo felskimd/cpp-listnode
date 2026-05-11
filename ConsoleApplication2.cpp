@@ -27,7 +27,8 @@ void Serialize(const std::string& file_name, ListNode* head) {
     nodes_to_ids[nullptr] = -1;
     ListNode* current = head;
     while (current != nullptr) {
-        if (nodes_to_ids.contains(current)) { // список с циклом - как-то неправильно (и не даст циклу закончиться)
+        // список с циклом - как-то неправильно (и не даст циклу закончиться)
+        if (nodes_to_ids.contains(current)) {
             throw std::runtime_error("infinite list");
         }
         nodes_to_ids[current] = current_id;
