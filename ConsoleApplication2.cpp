@@ -3,6 +3,7 @@
 #include <iostream>
 #include <random>
 #include <regex>
+//#include <stack>
 #include <unordered_map>
 
 struct ListNode { // ListNode модифицировать нельзя
@@ -88,7 +89,15 @@ ListNode* Deserialize(const std::string& file_name) {
     ListNode* current = nullptr;
     ListNode* prev = nullptr;
     int current_id = 0;
-    std::unordered_map<int, int> id_to_rand_value;
+
+    // memory usage optimization
+
+    std::unordered_map<int, std::vector<ListNode*>> forward_rand;
+
+    // non optimized
+
+    //std::unordered_map<int, int> id_to_rand_value;
+
     std::unordered_map<int, ListNode*> id_to_node;
     id_to_node[-1] = nullptr;
     std::string node_value;
@@ -112,7 +121,26 @@ ListNode* Deserialize(const std::string& file_name) {
             current->data = node_value + line.substr(0, parse_result->separator_pos);
             node_value.clear();
             id_to_node[current_id] = current;
-            id_to_rand_value[current_id] = parse_result->rand_id;
+
+            // memory usage optimization
+
+            if (parse_result->rand_id > current_id) {
+                forward_rand[parse_result->rand_id].push_back(current);
+            }
+            else {
+                current->rand = id_to_node.at(parse_result->rand_id);
+            }
+            if (forward_rand.contains(current_id)) {
+                for (auto* node : forward_rand.at(current_id)) {
+                    node->rand = current;
+                }
+                forward_rand.erase(current_id);
+            }
+
+            //non optimized
+
+            //id_to_rand_value[current_id] = parse_result->rand_id;
+
             prev = current;
             ++current_id;
         }
@@ -122,9 +150,12 @@ ListNode* Deserialize(const std::string& file_name) {
     }
     in.close();
 
-    for (const auto& [from, to] : id_to_rand_value) {
+    // non optimized
+
+    /*for (const auto& [from, to] : id_to_rand_value) {
         id_to_node.at(from)->rand = id_to_node.at(to);
-    }
+    }*/
+
     return head;
 }
 
@@ -136,7 +167,7 @@ void PrintValues(const ListNode* head) {
     }
 }
 
-void CreateRandInput(const std::string& name, size_t lines) {
+void CreateRandInput(const std::string& name, size_t lines, bool with_rand_ptr = true) {
     if (lines == 0) {
         return;
     }
@@ -157,7 +188,12 @@ void CreateRandInput(const std::string& name, size_t lines) {
         for (char& ch : value) {
             ch = char_dist(gen);
         }
-        out << value << ';' << len_dist(gen);
+        if (with_rand_ptr) {
+            out << value << ';' << len_dist(gen);
+        }
+        else {
+            out << value << ';' << -1;
+        }
     }
 }
 
@@ -167,7 +203,7 @@ int main()
     //PrintValues(list);
     Serialize("outlet.out", list);
     NonRecursiveDelete(list);
-    CreateRandInput("rand.txt", 1000000);
+    CreateRandInput("rand.txt", 1000000, false);
     list = Deserialize("rand.txt");
     Serialize("rand_out.txt", list);
     NonRecursiveDelete(list);
