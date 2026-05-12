@@ -1,6 +1,7 @@
 ﻿#include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <regex>
 #include <unordered_map>
 
@@ -11,11 +12,16 @@ struct ListNode { // ListNode модифицировать нельзя
     std::string data; // произвольные пользовательские данные 
 };
 
-void RecursiveDelete(ListNode* head) {
-    if (head->next) {
-        RecursiveDelete(head->next);
+void NonRecursiveDelete(ListNode* head) {
+    auto* it = head;
+    while (it->next != nullptr) {
+        it = it->next;
     }
-    delete head;
+    while (it != nullptr) {
+        auto* prev = it->prev;
+        delete it;
+        it = prev;
+    }
 }
 
 void Serialize(const std::string& file_name, ListNode* head) {
@@ -37,8 +43,15 @@ void Serialize(const std::string& file_name, ListNode* head) {
     }
     current = head;
     std::ofstream out(file_name);
+    bool first = true;
     while (current != nullptr) {
-        out << current->data << ';' << nodes_to_ids[current->rand] << '\n';
+        if (first) {
+            first = false;
+        }
+        else {
+            out << '\n';
+        }
+        out << current->data << ';' << nodes_to_ids[current->rand];
         current = current->next;
     }
 }
@@ -123,10 +136,39 @@ void PrintValues(const ListNode* head) {
     }
 }
 
+void CreateRandInput(const std::string& name, size_t lines) {
+    if (lines == 0) {
+        return;
+    }
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> len_dist(-1, lines - 1);
+    std::uniform_int_distribution<> char_dist(97, 122);
+    std::string value = "placeholder";
+    std::ofstream out(name);
+    bool first = true;
+    for (size_t i = 0; i < lines; ++i) {
+        if (first) {
+            first = false;
+        }
+        else {
+            out << '\n';
+        }
+        for (char& ch : value) {
+            ch = char_dist(gen);
+        }
+        out << value << ';' << len_dist(gen);
+    }
+}
+
 int main()
 {
     auto* list = Deserialize("inlet.in");
-    PrintValues(list);
+    //PrintValues(list);
     Serialize("outlet.out", list);
-    RecursiveDelete(list);
+    NonRecursiveDelete(list);
+    CreateRandInput("rand.txt", 1000000);
+    list = Deserialize("rand.txt");
+    Serialize("rand_out.txt", list);
+    NonRecursiveDelete(list);
 }
