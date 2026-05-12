@@ -203,8 +203,8 @@ int main()
     //PrintValues(list);
     Serialize("outlet.out", list);
     NonRecursiveDelete(list);
-    CreateRandInput("rand.txt", 1000000, false);
-    list = Deserialize("rand.txt");
-    Serialize("rand_out.txt", list);
-    NonRecursiveDelete(list);
+    //CreateRandInput("rand.txt", 1000000, false);
+    //list = Deserialize("rand.txt");
+    //Serialize("rand_out.txt", list);
+    //NonRecursiveDelete(list);
 }
