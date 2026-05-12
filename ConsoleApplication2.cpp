@@ -3,7 +3,6 @@
 #include <iostream>
 #include <random>
 #include <regex>
-//#include <stack>
 #include <unordered_map>
 
 struct ListNode { // ListNode модифицировать нельзя
@@ -34,7 +33,6 @@ void Serialize(const std::string& file_name, ListNode* head) {
     nodes_to_ids[nullptr] = -1;
     ListNode* current = head;
     while (current != nullptr) {
-        // список с циклом - как-то неправильно (и не даст циклу закончиться)
         if (nodes_to_ids.contains(current)) {
             throw std::runtime_error("infinite list");
         }
