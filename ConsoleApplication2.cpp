@@ -24,7 +24,6 @@ void Serialize(const std::string& file_name, ListNode* head) {
     if (head == nullptr) {
         return;
     }
-    // to binary
     std::ofstream out(file_name);
     if (!out.is_open()) {
         throw std::runtime_error("Can't open file");
