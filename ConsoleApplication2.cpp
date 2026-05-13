@@ -86,15 +86,7 @@ ListNode* Deserialize(const std::string& file_name) {
     ListNode* current = nullptr;
     ListNode* prev = nullptr;
     int current_id = 0;
-
-    // memory usage optimization
-
     std::unordered_map<int, std::vector<ListNode*>> forward_rand;
-
-    // non optimized
-
-    //std::unordered_map<int, int> id_to_rand_value;
-
     std::unordered_map<int, ListNode*> id_to_node;
     id_to_node[-1] = nullptr;
     std::string node_value;
@@ -121,9 +113,6 @@ ListNode* Deserialize(const std::string& file_name) {
             current->data = node_value + line.substr(0, parse_result->separator_pos);
             node_value.clear();
             id_to_node[current_id] = current;
-
-            // memory usage optimization
-
             if (parse_result->rand_id > current_id) {
                 forward_rand[parse_result->rand_id].push_back(current);
             }
@@ -136,11 +125,6 @@ ListNode* Deserialize(const std::string& file_name) {
                 }
                 forward_rand.erase(current_id);
             }
-
-            //non optimized
-
-            //id_to_rand_value[current_id] = parse_result->rand_id;
-
             prev = current;
             ++current_id;
         }
@@ -149,13 +133,6 @@ ListNode* Deserialize(const std::string& file_name) {
         }
     }
     in.close();
-
-    // non optimized
-
-    /*for (const auto& [from, to] : id_to_rand_value) {
-        id_to_node.at(from)->rand = id_to_node.at(to);
-    }*/
-
     return head;
 }
 
