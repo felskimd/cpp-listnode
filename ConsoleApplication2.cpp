@@ -13,20 +13,21 @@ struct ListNode { // ListNode модифицировать нельзя
 };
 
 void NonRecursiveDelete(ListNode* head) {
-    auto* it = head;
-    while (it->next != nullptr) {
-        it = it->next;
-    }
-    while (it != nullptr) {
-        auto* prev = it->prev;
-        delete it;
-        it = prev;
+    while (head != nullptr) {
+        auto* next = head->next;
+        delete head;
+        head = next;
     }
 }
 
 void Serialize(const std::string& file_name, ListNode* head) {
     if (head == nullptr) {
         return;
+    }
+    // to binary
+    std::ofstream out(file_name);
+    if (!out.is_open()) {
+        throw std::runtime_error("Can't open file");
     }
     int current_id = 0;
     std::unordered_map<ListNode*, int> nodes_to_ids;
@@ -41,7 +42,6 @@ void Serialize(const std::string& file_name, ListNode* head) {
         current = current->next;
     }
     current = head;
-    std::ofstream out(file_name);
     bool first = true;
     while (current != nullptr) {
         if (first) {
@@ -81,7 +81,7 @@ std::optional<ParsingData> ParseNodeEndingLine(std::string& target) {
 
 ListNode* Deserialize(const std::string& file_name) {
     if (!std::filesystem::exists(file_name)) {
-        throw std::runtime_error("file not found");
+        throw std::runtime_error("File not found");
     }
     ListNode* head = nullptr;
     ListNode* current = nullptr;
@@ -102,6 +102,9 @@ ListNode* Deserialize(const std::string& file_name) {
     std::string line;
     bool first = true;
     std::ifstream in(file_name);
+    if (!in.is_open()) {
+        throw std::runtime_error("Can't open file");
+    }
     // можно было сделать проще, но захотелось, чтобы <data> могла быть многострочной
     while (std::getline(in, line)) {
         auto parse_result = ParseNodeEndingLine(line);
@@ -201,8 +204,8 @@ int main()
     //PrintValues(list);
     Serialize("outlet.out", list);
     NonRecursiveDelete(list);
-    //CreateRandInput("rand.txt", 1000000, false);
-    //list = Deserialize("rand.txt");
-    //Serialize("rand_out.txt", list);
-    //NonRecursiveDelete(list);
+    CreateRandInput("rand.txt", 1000000, false);
+    list = Deserialize("rand.txt");
+    Serialize("rand_out.txt", list);
+    NonRecursiveDelete(list);
 }
