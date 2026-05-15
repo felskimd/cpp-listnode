@@ -24,8 +24,8 @@ void Serialize(const std::string& file_name, ListNode* head) {
     if (head == nullptr) {
         return;
     }
-    std::ofstream out(file_name);
-    if (!out.is_open()) {
+    std::ofstream out(file_name, std::ios::binary);
+    if (!out.is_open() || out.bad()) {
         throw std::runtime_error("Can't open file");
     }
     int current_id = 0;
@@ -93,11 +93,14 @@ ListNode* Deserialize(const std::string& file_name) {
     std::string line;
     bool first = true;
     std::ifstream in(file_name);
-    if (!in.is_open()) {
+    if (!in.is_open() || in.bad()) {
         throw std::runtime_error("Can't open file");
     }
     // можно было сделать проще, но захотелось, чтобы <data> могла быть многострочной
     while (std::getline(in, line)) {
+        if (in.fail()) {
+            throw std::runtime_error("Error on reading file");
+        }
         auto parse_result = ParseNodeEndingLine(line);
         if (parse_result) {
             current = new ListNode;
@@ -180,8 +183,8 @@ int main()
     //PrintValues(list);
     Serialize("outlet.out", list);
     NonRecursiveDelete(list);
-    CreateRandInput("rand.txt", 1000000, false);
-    list = Deserialize("rand.txt");
-    Serialize("rand_out.txt", list);
-    NonRecursiveDelete(list);
+    //CreateRandInput("rand.txt", 1000000, false);
+    //list = Deserialize("rand.txt");
+    //Serialize("rand_out.txt", list);
+    //NonRecursiveDelete(list);
 }
