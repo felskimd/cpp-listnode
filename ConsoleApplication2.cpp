@@ -74,6 +74,8 @@ std::optional<ParsingData> ParseNodeEndingLine(std::string& target) {
     if (!std::regex_search(rand_id_str, reg)) {
         return std::nullopt;
     }
+    //Исключение выпадет только в случае переполнения int, а по тз строк максимум порядка миллиона, 
+    //так как другой вид исключения в stoi пресекается регулярным выражением.
     auto rand_id = std::stoi(rand_id_str);
     return ParsingData{.separator_pos = sep_pos, .rand_id = rand_id};
 }
